@@ -92,3 +92,85 @@ fprintf('The current BFS is optimal and Optimality is reached\n') <br>
 end <br>
 end <br>
 </pre>
+
+<pre>
+%% Algorithm of Big M to solve LPP <br>
+<br>
+%% Phase I: Information Phase <br>
+Variables={'x_1','x_2','s_2','s_3','A_1','A_2','Sol'}; <br>
+M=1000; <br>
+Cost=[-2,-1,0,0,-M,-M,0]; %cost of the LPP <br>
+A=[3, 1, 0, 0, 1, 0, 3;4, 3, -1, 0, 0, 1, 6;1, 2, 0, 1, 0, 0, 3]; %Constraints <br>
+s=eye(size(A,1)); <br>
+%% To find the starting BFS <br>
+BV=[]; <br>
+for j=1:size(s,2) <br>
+    for i=1:size(A,2) <br>
+        if A(:,i)==s(:,j) <br>
+            BV=[BV i]; <br>
+        end <br>
+    end <br>
+end <br>
+%% To compute Z-Row(zj-cj) <br>
+ZjCj=Cost(BV)*A-Cost; <br>
+%% To print the table <br>
+ZCj=[ZjCj;A]; <br>
+SimpTable=array2table(ZCj); <br>
+SimpTable.Properties.VariableNames(1:size(ZCj,2))=Variables; <br>
+%% Simplex Table starts <br>
+Run=true; <br>
+while Run <br>
+    ZC=ZjCj(:,1:end-1); <br>
+    if any(ZC<0) %To check any negative value is there <br>
+        fprintf('The current BFS is not Optimal \n'); <br>
+        fprintf('\n ============The Next Iteration Results========\n'); <br>
+        %To find the entering variable <br>
+        [Entval,Pvt_Col]=min(ZC); <br>
+        fprintf('Entering Column is %d \n', Pvt_Col); <br>
+        %To find the leaving variable <br>
+        sol=A(:,end); <br>
+        Column=A(:,Pvt_Col); <br>
+        if all(Column<=0) <br>
+            fprintf('LPP has unbounded solution'); <br>
+        else <br>
+            %To check minimum ration is with positive entering column entries <br>
+            for i=1:size(Column,1) <br>
+                if Column(i)>0 <br>
+                    ratio(i)=sol(i)./Column(i); <br>
+                else <br>
+                    ratio(i)=inf; <br>
+                end <br>
+            end <br>
+            %To Finding the minimum Ratio <br>
+            [MinRatio, Pvt_Row]=min(ratio); <br>
+            fprintf('Leaving Row is %d \n', Pvt_Row); <br>
+        end <br>
+        BV(Pvt_Row)=Pvt_Col; <br>
+        %Pivot Key <br>
+        Pvt_Key=A(Pvt_Row,Pvt_Col); <br>
+        %Update the Table for next Iteration <br>
+        A(Pvt_Row,:)=A(Pvt_Row,:)./Pvt_Key; <br>
+        for i=1:size(A,1) <br>
+            if i~=Pvt_Row <br>
+                A(i,:)=A(i,:)-A(i,Pvt_Col).*A(Pvt_Row,:); <br>
+            end <br>
+            ZjCj=ZjCj-ZjCj(Pvt_Col).*A(Pvt_Row,:); <br>
+            %To print the table <br>
+            ZCj=[ZjCj;A]; <br>
+            SimpTable=array2table(ZCj); <br>
+            SimpTable.Properties.VariableNames(1:size(ZCj,2))=Variables; <br>
+        end <br>
+    else <br>
+        Run=false; <br>
+        fprintf('==================\n'); <br>
+        fprintf('The current BFS is optimal and Optimality is reached \n'); <br>
+        fprintf('==================\n'); <br>
+    end <br>
+end <br>
+BFS=zeros(1,size(A,2)); <br>
+BFS(BV)=A(:,end); <br>
+BFS(end)=sum(BFS.*Cost); <br>
+CurrentBFS=array2table(BFS); <br>
+CurrentBFS.Properties.VariableNames(1:size(CurrentBFS,2))=Variables; <br>
+</pre>
+</html>
