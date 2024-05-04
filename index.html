@@ -231,3 +231,34 @@ fprintf('transportation cost is %f',z) <br>
 </pre>
 </html>
 
+<pre>
+%% Algorithm of Steepest Descent Method to solve LPP <br>
+<br>
+syms x y <br>
+f1=x-y+2*x^2+2*x*y+y^2 <br>
+f=inline(f1) <br>
+fobj=@(x)f(x(:,1),x(:,2)) <br>
+grad=gradient(f1) <br>
+G=inline(grad) <br>
+grad_x=@(x)G(x(:,1),x(:,2)) <br>
+H1=hessian(f1) <br>
+HX=inline(H1) <br>
+x_1=[1 1] <br>
+max_iteration=4 <br>
+tol=0.003 <br>
+iter=0 <br>
+X=[] <br>
+while norm(grad_x(x_1))>tol && iter<max_iteration <br>
+    X=[X,x_1] <br>
+    S=-grad_x(x_1) <br>
+    H=HX(x_1) <br>
+    lam=(S'*S)./(S'*H*S) <br>
+    x_new=x_1+lam.\*S' <br>
+    x_1=x_new <br>
+    iter=iter+1 <br>
+end <br>
+fprintf('optimal sol X=[%f %f]',x_1(1),x_1(2)) <br>
+fprintf('optimal value f(x)=%f',fobj(x_1)) <br>
+</pre>
+</html>
+
