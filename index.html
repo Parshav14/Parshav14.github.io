@@ -174,3 +174,60 @@ CurrentBFS=array2table(BFS); <br>
 CurrentBFS.Properties.VariableNames(1:size(CurrentBFS,2))=Variables; <br>
 </pre>
 </html>
+
+<pre>
+%% Algorithm of LCM to solve LPP <br>
+<br>
+clc <br>
+clear all <br>
+c=[2 1 4; 3 1 2; 5 6 7] <br>
+a=[50 150 200] <br>
+b=[100 130 200] <br>
+z=0 <br>
+if sum(a) == sum(b) <br>
+    fprintf('Given Problem is balanced') <br>
+else <br>
+    fprintf('Given problem is unbalanced') <br>
+    if sum(a)>sum(b) <br>
+        c(:,end+1)=zeros(length(a),1) <br>
+        b(end+1)=sum(a)-sum(b) <br>
+    else <br>
+        c(end+1,:)=zeros(1,length(b)) <br>
+        a(end+1)=sum(b)-sum(a) <br>
+    end <br>
+end <br>
+X=zeros(size(c,1),size(c,2)) <br>
+initialc = c; <br>
+for i=1:size(c,1) <br>
+    for j=1:size(c,2) <br>
+        cpq=min(c(:)) <br>
+        if cpq==inf <br>
+            break <br>
+        end <br>
+        [p1,q1]=find(cpq==c) <br>
+        possalloc = min(a(p1), b(q1)) <br>
+        [maxalloc, indx] = max(possalloc) <br>
+        p = p1(indx) <br>
+        q = q1(indx) <br>
+        X(p,q) = min(a(p),b(q)) <br>
+        if min(a(p),b(q))==a(p) <br>
+            b(q)=b(q)-a(p) <br>
+            a(p)=a(p)-X(p,q) <br>
+            c(p,:)=inf <br>
+        else <br>
+            a(p)=a(p)-b(q) <br>
+            b(q)=b(q)-X(p,q) <br>
+            c(:,q)=inf <br>
+        end <br>
+    end <br>
+end <br>
+for i=1:size(c,1) <br>
+    for j=1:size(c,2) <br>
+        z=z+ initialc(i,j)\*X(i,j); <br>
+    end <br>
+end <br>
+array2table(X) <br>
+fprintf('transportation cost is %f',z) <br>
+</pre>
+</html>
+
