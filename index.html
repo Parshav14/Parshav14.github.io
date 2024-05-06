@@ -171,7 +171,7 @@ BFS=zeros(1,size(A,2)); <br>
 BFS(BV)=A(:,end); <br>
 BFS(end)=sum(BFS.*Cost); <br>
 CurrentBFS=array2table(BFS); <br>
-CurrentBFS.Properties.VariableNames(1:size(CurrentBFS,2))=Variables; <br>
+CurrentBFS.Properties.VariableNames(1:size(CurrentBFS,2))=Variables <br>
 </pre>
 </html>
 
@@ -223,13 +223,119 @@ for i=1:size(c,1) <br>
 end <br>
 for i=1:size(c,1) <br>
     for j=1:size(c,2) <br>
-        z=z+ initialc(i,j)\*X(i,j); <br>
+        z=z+ initialc(i,j)*X(i,j); <br>
     end <br>
 end <br>
 array2table(X) <br>
 fprintf('transportation cost is %f',z) <br>
 </pre>
 </html>
+
+<pre>
+<strong>%% Algorithm of LCM to solve LPP -- By Aaditya</strong><br>
+format short
+
+Cost = [11 20 7 8; 21 16 10 12; 6 12 18 9]
+
+A=[50 40 70]
+
+B=[30 25 35 40]
+
+if sum(A) == sum (B)
+
+fprintf ("The problem is balanced.")
+
+else 
+
+fprintf ("The problem is Unbalanced")
+
+if sum(A)<sum(B)
+
+fprintf("D<S -> Add a dummy row");
+
+Cost(end+1,:) = zeros (1,size(B,2))
+
+A(end+1) = sum(B)-sum(A)
+
+
+
+else if sum(B) < sum(A)
+
+fprintf("S<D -> Add a dummy column");
+
+Cost(:,end+1) = zeros (1, size(A,2))
+
+B(end+1) = sum (A)-sum(B)
+
+end
+
+end
+
+end
+
+ICost = Cost
+
+X = zeros (size(Cost))
+
+[m,n] = size(Cost)
+
+BFS = m+n-1
+
+for i=1:size(Cost,1)
+
+for j=1:size(Cost,2)
+
+hh = min(Cost(:))
+
+[Row_index, Col_index] = find(hh==Cost)
+
+
+
+x11=min (A(Row_index),B(Col_index))
+
+[Value, index] = max(x11)
+
+ii= Row_index(index)
+
+jj= Col_index(index)
+
+y11=min(A(ii), B(jj))
+
+X(ii,jj) = y11
+
+A(ii) = A(ii) - y11
+
+B(jj) = B(jj) - y11
+
+Cost (ii,jj) = Inf
+
+end
+
+end
+
+fprintf('Initial BFS = /n');
+
+IB=array2table(X);
+
+disp(IB);
+
+TotalBFS=length(nonzeros(X));
+
+if TotalBFS==BFS
+
+fprintf('Inital BFS is Non-Degenerate /n');
+
+else
+
+fprintf('Initial BFS is Degenerate /n');
+
+end
+
+InitialCost= sum(sum(ICost.*X));
+
+fprintf('Initial BFS Cost = %d/n',InitialCost);
+</pre>
+
 
 <pre>
 <strong>%% Algorithm of Steepest Descent Method to solve LPP</strong><br>
@@ -253,7 +359,7 @@ while norm(grad_x(x_1))>tol && iter<max_iteration <br>
     S=-grad_x(x_1) <br>
     H=HX(x_1) <br>
     lam=(S'*S)./(S'*H*S) <br>
-    x_new=x_1+lam.\*S' <br>
+    x_new=x_1+lam.*S' <br>
     x_1=x_new <br>
     iter=iter+1 <br>
 end <br>
@@ -261,4 +367,44 @@ fprintf('optimal sol X=[%f %f]',x_1(1),x_1(2)) <br>
 fprintf('optimal value f(x)=%f',fobj(x_1)) <br>
 </pre>
 </html>
+
+<pre>
+<strong>%% Algorithm of Steepest Descent Method to solve LPP --By Aaditya</strong><br>
+syms x1 x2
+
+% Define objective function (min)
+f1 = x1 - x2 + 2 * x1^2 + 2 * x1 * x2 + x2^2;
+
+fx = inline(f1);  % Convert to function
+fobj = @(X) fx(X(1), X(2));
+
+% Gradient of f
+grad = gradient(f1);
+G1 = inline(grad);
+Gx = @(X) G1(X(1), X(2));
+
+% Hessian matrix
+H1 = hessian(f1);
+Hx = inline(H1);
+
+X0 = [0 0];         % Set initial vector
+maxiter = 4;        % Set max iteration
+tol = 10^(-3);      % Max tolerance
+iter = 0;           % Initial counter
+X = [];
+
+while norm(Gx(X0)) > tol && iter < maxiter
+    X = [X; X0];         % Save all vectors
+    S = -Gx(X0);         % Compute gradient at x
+    H = Hx(X0);          % Compute Hessian at X
+    lambda = S' * S / (S' * H * S);   % Compute lambda
+    Xnew = X0 + lambda * S';    % Update x
+    X0 = Xnew;          % Save new X  
+    iter = iter + 1;        % Update iteration
+end
+
+fprintf('optimal sol x = [%f, %f]\n', X0(1), X0(2));
+fprintf('optimal value f(x) = %f\n', fobj(X0));
+</pre>
+
 
