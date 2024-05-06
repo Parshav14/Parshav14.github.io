@@ -93,6 +93,7 @@ end <br>
 end <br>
 </pre>
 
+
 <pre>
 <strong>%% Algorithm of Big M to solve LPP </strong><br>
 <br>
@@ -174,6 +175,147 @@ CurrentBFS=array2table(BFS); <br>
 CurrentBFS.Properties.VariableNames(1:size(CurrentBFS,2))=Variables <br>
 </pre>
 </html>
+
+
+<strong>%% Algorithm of Big M to solve LPP --By Aaditya</strong><br>
+
+
+clc
+
+clear all
+
+format short
+
+Variables={'x_1','x_2','s_2','s_3','A_1','A_2','Sol'}
+
+M=1000
+
+Cost=[-2,-1,0,0,-M,-M,0]
+
+A=[3, 1, 0, 0, 1, 0, 3;4, 3, -1, 0, 0, 1, 6;1, 2, 0, 1, 0, 0, 3]
+
+s=eye(size(A,1))
+
+BV=[]
+
+for j=1:size(s,2)
+
+for i=1:size(A,2)
+
+if A(:,i)==s(:,j)
+
+BV=[BV i]
+
+end
+
+end
+
+end
+
+ZjCj=Cost(BV)*A-Cost
+
+ZCj=[ZjCj;A];
+
+SimpTable=array2table(ZCj)
+
+SimpTable.Properties.VariableNames(1:size(ZCj,2))=Variables
+
+Run=true;
+
+while Run
+
+ZC=ZjCj(:,1:end-1);
+
+if any(ZC<0)
+
+fprintf('The current BFS is not Optimal \n')
+
+fprintf('\n ============The Next Iteration Results========\n')
+
+[Entval,Pvt_Col]=min(ZC);
+
+fprintf('Entering Column is %d \n', Pvt_Col)
+
+sol=A(:,end)
+
+Column=A(:,Pvt_Col)
+
+if all(Column<=0)
+
+fprintf('LPP has unbounded solution')
+
+else
+
+for i=1:size(Column,1)
+
+if Column(i)>0
+
+ratio(i)=sol(i)./Column(i)
+
+else
+
+ratio(i)=inf
+
+end
+
+end
+
+[MinRatio, Pvt_Row]=min(ratio)
+
+fprintf('Leaving Row is %d \n', Pvt_Row)
+
+end
+
+BV(Pvt_Row)=Pvt_Col
+
+Pvt_Key=A(Pvt_Row,Pvt_Col);
+
+A(Pvt_Row,:)=A(Pvt_Row,:)./Pvt_Key;
+
+for i=1:size(A,1)
+
+if i~=Pvt_Row
+
+A(i,:)=A(i,:)-A(i,Pvt_Col).*A(Pvt_Row,:);
+
+end
+
+ZjCj=ZjCj-ZjCj(Pvt_Col).*A(Pvt_Row,:);
+
+
+
+ZCj=[ZjCj;A];
+
+SimpTable=array2table(ZCj);
+
+SimpTable.Properties.VariableNames(1:size(ZCj,2))=Variables
+
+end
+
+else
+
+Run=false;
+
+fprintf('==================\n')
+
+fprintf('The current BFS is optimal and Optimality is reached \n')
+
+fprintf('==================\n')
+
+end
+
+end
+
+BFS=zeros(1,size(A,2))
+
+BFS(BV)=A(:,end)
+
+BFS(end)=sum(BFS.*Cost)
+
+CurrentBFS=array2table(BFS)
+
+CurrentBFS.Properties.VariableNames(1:size(CurrentBFS,2))=Variables
+
 
 <pre>
 <strong>%% Algorithm of LCM to solve LPP </strong><br>
@@ -376,6 +518,7 @@ fprintf('optimal value f(x)=%f',fobj(x_1)) <br>
 </pre>
 </html>
 
+
 <pre>
 <strong>%% Algorithm of Steepest Descent Method to solve LPP --By Aaditya</strong><br>
 syms x1 x2
@@ -414,5 +557,3 @@ end
 fprintf('optimal sol x = [%f, %f]\n', X0(1), X0(2));
 fprintf('optimal value f(x) = %f\n', fobj(X0));
 </pre>
-
-
