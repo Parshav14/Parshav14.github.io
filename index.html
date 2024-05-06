@@ -235,11 +235,15 @@ fprintf('transportation cost is %f',z) <br>
 <strong>%% Algorithm of LCM to solve LPP -- By Aaditya</strong><br>
 format short
 
+%%input phase
+
 Cost = [11 20 7 8; 21 16 10 12; 6 12 18 9]
 
-A=[50 40 70]
+A=[50 40 70] %demand
 
-B=[30 25 35 40]
+B=[30 25 35 40] %supply
+
+%%TO CHECK FOR BALANCED/UNBALANCED
 
 if sum(A) == sum (B)
 
@@ -249,21 +253,21 @@ else
 
 fprintf ("The problem is Unbalanced")
 
-if sum(A)<sum(B)
+if sum(A)<sum(B) %supply is greater, add a row
 
 fprintf("D<S -> Add a dummy row");
 
 Cost(end+1,:) = zeros (1,size(B,2))
 
-A(end+1) = sum(B)-sum(A)
+A(end+1) = sum(B)-sum(A) %add the difference as the demand for the new row
 
 
 
-else if sum(B) < sum(A)
+else if sum(B) < sum(A) %demand is greater, add a column
 
 fprintf("S<D -> Add a dummy column");
 
-Cost(:,end+1) = zeros (1, size(A,2))
+Cost(:,end+1) = zeros (1, size(A,2)) %add a dummy column, initialise with zeros
 
 B(end+1) = sum (A)-sum(B)
 
@@ -273,21 +277,25 @@ end
 
 end
 
-ICost = Cost
+%%-------------------------------------------
 
-X = zeros (size(Cost))
+ICost = Cost %backup for Cost
 
-[m,n] = size(Cost)
+X = zeros (size(Cost)) %allocating zeros to X
 
-BFS = m+n-1
+[m,n] = size(Cost) %find no of rows and columns
+
+BFS = m+n-1 %no of basic variables
+
+%%Finding the cell with the minimum cost for allocation
 
 for i=1:size(Cost,1)
 
 for j=1:size(Cost,2)
 
-hh = min(Cost(:))
+hh = min(Cost(:)) %Finding the min Cost Value
 
-[Row_index, Col_index] = find(hh==Cost)
+[Row_index, Col_index] = find(hh==Cost) %Find the Index
 
 
 
