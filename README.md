@@ -254,3 +254,5 @@ iter=iter+1
 end
 fprintf('optimal sol X=[%f %f]',x_1(1),x_1(2))
 fprintf('optimal value f(x)=%f',fobj(x_1))
+
+<a href="https://colab.research.google.com/drive/1TYKESyV-NJmtT7DHVbzvryK0urJMUWd9?usp=drive_link">Colab Link</a><br><pre>Code here</pre>
